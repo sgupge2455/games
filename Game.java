@@ -19,15 +19,14 @@ class Game extends JFrame implements KeyListener {
 
     Game() {
         super("Dungeon Game");
-        
+
         map = new Map(this);
         actors = new ArrayList<Actor>();
         actors.add(new Player(this, "Taro"));
         for (int i = 0; i < NUM_OF_MONSTERS; i++) {
             if (random.nextInt(2) == 0) {
                 actors.add(new Monster(this));
-            } 
-            else {
+            } else {
                 actors.add(new RedMonster(this));
             }
         }
@@ -38,7 +37,9 @@ class Game extends JFrame implements KeyListener {
 
         JPanel actorsPanel = new JPanel();
         actorsPanel.setLayout(new GridLayout(10, 1));
-        for (Actor a : actors) { actorsPanel.add(a); }
+        for (Actor a : actors) {
+            actorsPanel.add(a);
+        }
         add(actorsPanel, BorderLayout.SOUTH);
 
         setVisible(true);
@@ -46,30 +47,40 @@ class Game extends JFrame implements KeyListener {
         addKeyListener(this);
     }
 
-    void print() { repaint(); }
+    void print() {
+        repaint();
+    }
 
     void turn() {
-        for (Actor a : actors) { a.action(); }
+        for (Actor a : actors) {
+            a.action();
+        }
         print();
     }
 
     static char keyChar;
-    
-    static char getKeyChar() { return keyChar; }
-    
-    static void setKeyChar(char c) { keyChar = c; }
-    
+
+    static char getKeyChar() {
+        return keyChar;
+    }
+
+    static void setKeyChar(char c) {
+        keyChar = c;
+    }
+
     @Override
     public void keyPressed(KeyEvent e) {
         setKeyChar(e.getKeyChar());
         turn();
     }
-    
+
     @Override
-    public void keyReleased(KeyEvent e){}
-    
+    public void keyReleased(KeyEvent e) {
+    }
+
     @Override
-    public void keyTyped(KeyEvent e){}
+    public void keyTyped(KeyEvent e) {
+    }
 }
 
 class Map extends JPanel {
@@ -83,29 +94,33 @@ class Map extends JPanel {
         this.game = game;
         for (int x = 0; x < XSIZE; x++) {
             for (int y = 0; y < YSIZE; y++) {
-                if ((x == 0)||(x == XSIZE-1)||
-                    (y == 0)||(y == YSIZE-1)||
-                    ((Math.abs(x-XSIZE/2) <= 1)&&
-                     (Math.abs(y-YSIZE/2) <= 1))) {
+                if ((x == 0) || (x == XSIZE - 1) ||
+                        (y == 0) || (y == YSIZE - 1) ||
+                        ((Math.abs(x - XSIZE / 2) <= 1) &&
+                                (Math.abs(y - YSIZE / 2) <= 1))) {
                     data[x][y] = new RockCell();
-                }
-                else {
+                } else {
                     switch (Game.random.nextInt(5)) {
-                    case 0: data[x][y] = new PotionCell();
-                             break;
-                    case 1: data[x][y] = new PoisonCell();
-                             break;
-                    default: data[x][y] = new EmptyCell();
+                        case 0:
+                            data[x][y] = new PotionCell();
+                            break;
+                        case 1:
+                            data[x][y] = new PoisonCell();
+                            break;
+                        default:
+                            data[x][y] = new EmptyCell();
                     }
                 }
             }
         }
-        data[XSIZE-2][YSIZE-2] = new GoalCell();
+        data[XSIZE - 2][YSIZE - 2] = new GoalCell();
 
-        setPreferredSize(new Dimension(Cell.SIZE*XSIZE, Cell.SIZE*YSIZE));
+        setPreferredSize(new Dimension(Cell.SIZE * XSIZE, Cell.SIZE * YSIZE));
     }
 
-    Cell getAt(Int2 position) { return data[position.x][position.y]; }
+    Cell getAt(Int2 position) {
+        return data[position.x][position.y];
+    }
 
     void setAt(Int2 position, Cell cell) {
         data[position.x][position.y] = cell;
@@ -128,9 +143,11 @@ class Map extends JPanel {
     Int2 getRandomCellPosition() {
         while (true) {
             Int2 position = new Int2(Game.random.nextInt(XSIZE),
-                                     Game.random.nextInt(YSIZE));
+                    Game.random.nextInt(YSIZE));
 
-            if (!getAt(position).isRockCell()) { return position; }
+            if (!getAt(position).isRockCell()) {
+                return position;
+            }
         }
     }
 }
@@ -171,11 +188,11 @@ abstract class Actor extends JLabel {
     void paintAt(Graphics g, Int2 position) {
         if (this.position.equal(position)) {
             g.drawImage(getImage(),
-                        position.x*Cell.SIZE + Cell.SIZE*2/24,
-                        position.y*Cell.SIZE + Cell.SIZE*2/24,
-                        Cell.SIZE*20/24,
-                        Cell.SIZE*20/24,
-                        game.map);
+                    position.x * Cell.SIZE + Cell.SIZE * 2 / 24,
+                    position.y * Cell.SIZE + Cell.SIZE * 2 / 24,
+                    Cell.SIZE * 20 / 24,
+                    Cell.SIZE * 20 / 24,
+                    game.map);
         }
     }
 
@@ -185,10 +202,14 @@ abstract class Actor extends JLabel {
         Int2 target = position.add(direction);
 
         Cell cell = game.map.getAt(target);
-        if (cell.isRockCell()) { return false; }
+        if (cell.isRockCell()) {
+            return false;
+        }
 
         for (Actor a : game.actors) {
-            if (target.equal(a.position)) { return false; }
+            if (target.equal(a.position)) {
+                return false;
+            }
         }
 
         Cell newCell = cell.affectOn(this);
@@ -210,9 +231,15 @@ abstract class Actor extends JLabel {
     }
 
     abstract void takeDamageFrom(Actor a);
-    void giveDamageTo(Player p) {}
-    void giveDamageTo(Monster m) {}
-    void giveDamageTo(RedMonster r) {}
+
+    void giveDamageTo(Player p) {
+    }
+
+    void giveDamageTo(Monster m) {
+    }
+
+    void giveDamageTo(RedMonster r) {
+    }
 }
 
 class Player extends Actor {
@@ -224,35 +251,64 @@ class Player extends Actor {
         this.name = name;
     }
 
-    Player(Game game) { this(game, "Player"); }
+    Player(Game game) {
+        this(game, "Player");
+    }
 
-    public String toString() { return name+" : "+position+" "+hp; }
-
-    @Override
-    void takeDamageFrom(Actor a) { a.giveDamageTo(this); }
-
-    @Override
-    void giveDamageTo(Monster m) { m.hp -= 20; }
+    public String toString() {
+        return name + " : " + position + " " + hp;
+    }
 
     @Override
-    void giveDamageTo(RedMonster r) { r.hp -= 15; }
+    void takeDamageFrom(Actor a) {
+        a.giveDamageTo(this);
+    }
+
+    @Override
+    void giveDamageTo(Monster m) {
+        m.hp -= 20;
+    }
+
+    @Override
+    void giveDamageTo(RedMonster r) {
+        r.hp -= 15;
+    }
 
     @Override
     void action() {
         Int2 direction;
         switch (Game.getKeyChar()) {
-            case 'z': direction = new Int2(-1, +1); break;
-            case 'x': direction = new Int2( 0, +1); break;
-            case 'c': direction = new Int2(+1, +1); break;
-            case 'a': direction = new Int2(-1,  0); break;
-            case 'd': direction = new Int2(+1,  0); break;
-            case 'q': direction = new Int2(-1, -1); break;
-            case 'w': direction = new Int2( 0, -1); break;
-            case 'e': direction = new Int2(+1, -1); break;
-            default: direction = new Int2(0, 0);
+            case 'z':
+                direction = new Int2(-1, +1);
+                break;
+            case 'x':
+                direction = new Int2(0, +1);
+                break;
+            case 'c':
+                direction = new Int2(+1, +1);
+                break;
+            case 'a':
+                direction = new Int2(-1, 0);
+                break;
+            case 'd':
+                direction = new Int2(+1, 0);
+                break;
+            case 'q':
+                direction = new Int2(-1, -1);
+                break;
+            case 'w':
+                direction = new Int2(0, -1);
+                break;
+            case 'e':
+                direction = new Int2(+1, -1);
+                break;
+            default:
+                direction = new Int2(0, 0);
         }
 
-        if (!moveTo(direction)) { attackTo(direction); }
+        if (!moveTo(direction)) {
+            attackTo(direction);
+        }
     }
 
     static final Image image1 = Toolkit.getDefaultToolkit().getImage("Player1.png");
@@ -260,27 +316,40 @@ class Player extends Actor {
 
     @Override
     Image getImage() {
-        if (hp > INIT_HP/2) { return image1; }
-        else { return image2; }
+        if (hp > INIT_HP / 2) {
+            return image1;
+        } else {
+            return image2;
+        }
     }
 }
 
 class Monster extends Actor {
     static final int INIT_HP = 150;
 
-    Monster(Game game) { super(game, INIT_HP); }
+    Monster(Game game) {
+        super(game, INIT_HP);
+    }
 
     @Override
-    public String toString() { return "Monster : "+position+" "+hp; }
+    public String toString() {
+        return "Monster : " + position + " " + hp;
+    }
 
     @Override
-    void takeDamageFrom(Actor a) { a.giveDamageTo(this); }
+    void takeDamageFrom(Actor a) {
+        a.giveDamageTo(this);
+    }
 
     @Override
-    void giveDamageTo(Player p) { p.hp -= 30; }
+    void giveDamageTo(Player p) {
+        p.hp -= 30;
+    }
 
     @Override
-    void giveDamageTo(RedMonster r) { r.hp -= 5; }
+    void giveDamageTo(RedMonster r) {
+        r.hp -= 5;
+    }
 
     @Override
     void action() {
@@ -295,69 +364,104 @@ class Monster extends Actor {
     static final Image image = Toolkit.getDefaultToolkit().getImage("Monster.png");
 
     @Override
-    Image getImage() { return image; }
+    Image getImage() {
+        return image;
+    }
 }
 
 class RedMonster extends Monster {
-    RedMonster(Game game) { super(game); }
+    RedMonster(Game game) {
+        super(game);
+    }
 
     @Override
-    public String toString() { return "Red" + super.toString(); }
+    public String toString() {
+        return "Red" + super.toString();
+    }
 
     @Override
-    void takeDamageFrom(Actor a) { a.giveDamageTo(this); }
+    void takeDamageFrom(Actor a) {
+        a.giveDamageTo(this);
+    }
 
     @Override
-    void giveDamageTo(Player p) { p.hp -= 60; }
+    void giveDamageTo(Player p) {
+        p.hp -= 60;
+    }
 
     @Override
-    void giveDamageTo(Monster m) { m.hp -= 7; }
+    void giveDamageTo(Monster m) {
+        m.hp -= 7;
+    }
 
     static final Image image = Toolkit.getDefaultToolkit().getImage("RedMonster.png");
 
     @Override
-    Image getImage() { return image; }
+    Image getImage() {
+        return image;
+    }
 }
 
 class Int2 {
     int x, y;
 
-    Int2(int x, int y) { this.x = x; this.y = y; }
-    Int2 add(Int2 a) { return new Int2(x + a.x, y + a.y); }
-    Int2 sub(Int2 a) { return new Int2(x - a.x, y - a.y); }
-    Int2 signum() { return new Int2(Integer.signum(x), Integer.signum(y)); }
-    boolean equal(Int2 a) { return (x == a.x) && (y == a.y); }
-    
-    public String toString() { return "(" + x + "," + y + ")"; }
+    Int2(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    Int2 add(Int2 a) {
+        return new Int2(x + a.x, y + a.y);
+    }
+
+    Int2 sub(Int2 a) {
+        return new Int2(x - a.x, y - a.y);
+    }
+
+    Int2 signum() {
+        return new Int2(Integer.signum(x), Integer.signum(y));
+    }
+
+    boolean equal(Int2 a) {
+        return (x == a.x) && (y == a.y);
+    }
+
+    public String toString() {
+        return "(" + x + "," + y + ")";
+    }
 }
 
 abstract class Cell {
     static final int SIZE = 48;
 
-    boolean isRockCell() { return false; }
+    boolean isRockCell() {
+        return false;
+    }
 
     abstract Cell affectOn(Actor a);
 
     abstract void paintAt(Graphics g, Int2 position);
 
     void drawCell(Graphics g, Int2 position) {
-        g.drawRect(position.x*SIZE + SIZE/24,
-                   position.y*SIZE + SIZE/24,
-                   SIZE*22/24,
-                   SIZE*22/24);
+        g.drawRect(position.x * SIZE + SIZE / 24,
+                position.y * SIZE + SIZE / 24,
+                SIZE * 22 / 24,
+                SIZE * 22 / 24);
     }
 
     void fillCell(Graphics g, Int2 position) {
-        g.fillRect(position.x*SIZE + SIZE/24,
-                   position.y*SIZE + SIZE/24,
-                   SIZE*22/24,
-                   SIZE*22/24);
+        g.fillRect(position.x * SIZE + SIZE / 24,
+                position.y * SIZE + SIZE / 24,
+                SIZE * 22 / 24,
+                SIZE * 22 / 24);
     }
 }
 
 abstract class SimpleCell extends Cell {
     @Override
-    Cell affectOn(Actor a) { return this; }
+    Cell affectOn(Actor a) {
+        return this;
+    }
 }
 
 abstract class TrapCell extends Cell {
@@ -378,7 +482,9 @@ class RockCell extends SimpleCell {
     }
 
     @Override
-    boolean isRockCell() { return true; }
+    boolean isRockCell() {
+        return true;
+    }
 }
 
 class EmptyCell extends SimpleCell {
