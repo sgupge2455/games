@@ -156,6 +156,7 @@ abstract class Actor extends JLabel {
     Game game;
     Int2 position;
     int hp;
+    boolean isRedMonster = false;
 
     Actor(Game game, Int2 position, int hp) {
         super(" ");
@@ -348,7 +349,7 @@ class Monster extends Actor {
 
     @Override
     void giveDamageTo(RedMonster r) {
-        r.hp -= 5;
+        r.hp -= 7;
     }
 
     @Override
@@ -370,35 +371,61 @@ class Monster extends Actor {
 }
 
 class RedMonster extends Monster {
+    static final int INIT_HP = 150;
+    static final int DAMAGE_THRESHOLD = INIT_HP * 2 / 3;
+    boolean isRed = false;
+
     RedMonster(Game game) {
         super(game);
     }
 
     @Override
     public String toString() {
-        return "Red" + super.toString();
+        if (isRed) {
+            return "Red" + super.toString();
+        } else {
+            return super.toString();
+        }
     }
 
     @Override
     void takeDamageFrom(Actor a) {
+        if (!isRed && hp <= DAMAGE_THRESHOLD) {
+            isRed = true;
+            // Change to RedMonster image and stats
+        }
         a.giveDamageTo(this);
     }
 
     @Override
     void giveDamageTo(Player p) {
-        p.hp -= 60;
+        if (isRed) {
+            p.hp -= 80;
+        } else {
+            super.giveDamageTo(p);
+        }
     }
 
     @Override
-    void giveDamageTo(Monster m) {
-        m.hp -= 7;
+    void action() {
+        Actor player = game.actors.get(game.PLAYER_ID);
+        Int2 direction = player.position.sub(position).signum();
+
+        if (!moveTo(direction)) {
+            attackTo(direction);
+        }
     }
 
-    static final Image image = Toolkit.getDefaultToolkit().getImage("RedMonster.png");
+    static final Image imageRed = Toolkit.getDefaultToolkit().getImage("RedMonster.png");
+    static final Image imageNormal = Toolkit.getDefaultToolkit().getImage("Monster.png");
 
     @Override
     Image getImage() {
-        return image;
+        if (isRed) {
+            return imageRed;
+        } else {
+            return imageNormal;
+        }
     }
 }
 
